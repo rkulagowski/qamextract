@@ -1,21 +1,26 @@
 #!/usr/bin/perl -w
 # Robert Kulagowski
 # qam-info@schedulesdirect.org
+# qamextract.pl
+
+# This program is used to extract the QAM information from an
+# already-configured MythTV system.  It will allow a user to share what they
+# have already determined to be a known-good QAM scan for their lineup.
 
 use strict;
 use warnings;
 use DBI;
-use Getopt::Long; # Command Line Interface options
+use Getopt::Long;
 
-my $version = 0.01;
+my $version = 0.02;
 my $date = "2011-12-01";
-my $help;
-my $sourceid;
-my $qam_frequency;
+my ($help, $myth, $dbh, $query, $sth, $lineupid, $sourcename);
+my $sourceid = -1;
+my $qam_frequency = "000000000";
 
 eval 'require MythTV';
 if ($@) {
-    print "\n\nMythTV.pm module not installed.\n";
+    print "\n\nFatal error: MythTV.pm module not installed, exiting.\n";
     exit;
 }
 
@@ -30,33 +35,66 @@ if ($help) {
   print "\nqamextract.pl v$version $date\n" .
         "This script supports the following command line arguments." .
         "\n--debug      Enable debug mode.  Prints additional information " .
-        "\n             to assist with any issues." .
+        "\n             to assist with troubleshooting." .
         "\n--sourceid   Which sourceid to use." .
         "\n--help       This screen.\n" .
         "\nBug reports to qam-info\@schedulesdirect.org\n\n";
   exit;
 }
 
-my $myth = new MythTV();
+$myth = new MythTV();
 
-my $dbh = $myth->{'dbh'};
+$dbh = $myth->{'dbh'};
 
-my $query = "SELECT channum, callsign, xmltvid, mplexid, serviceid FROM channel where sourceid=$sourceid;";
-my $sth = &query( $dbh, $query );
+if ($sourceid == -1) {
+    print "This system has the following sources:\n";
+    print "Sourceid\t Name\n";
+    $query = "SELECT sourceid, name from videosource;";
+    $sth = &query( $dbh, $query );
+    my ($source, $name);
+    my $i=0;
+    while ( ($source,$name) = $sth->fetchrow_array() ) {
+        print "$source\t\t $name\n";
+        $i++;
+        # Save the sourceid in case we only go through the loop once.
+        $sourceid = $source; 
+    }
+
+    if ($i > 1) {
+        print "Select sourceid: ";
+        chomp ($sourceid = <STDIN>);
+    }
+if ($debugenabled) { print "sourceid is $sourceid\n"; }
+}
+
+$query = "SELECT lineupid from videosource where sourceid=$sourceid;";
+$sth = &query( $dbh, $query );
+
+my @row=$sth->fetchrow_array;
+($lineupid) = @row;
+
+open MYFILE, ">", "$lineupid.qam.conf";
+
+$query = "SELECT channum, callsign, xmltvid, mplexid, serviceid FROM channel where sourceid=$sourceid;";
+$sth = &query( $dbh, $query );
 
 # Get the rows
 while( my @row=$sth->fetchrow_array ) {
     my ($channum, $callsign, $xmltvid, $mplexid, $serviceid) = @row;
+
     my $sth1 = &query($dbh, "SELECT frequency from dtv_multiplex where mplexid=$mplexid;");
 
     while( my @row1=$sth1->fetchrow_array ) {
         ($qam_frequency) = @row1;
     }
 
-    print "$callsign:$qam_frequency:QAM_256:$channum:$xmltvid:$serviceid\n";
+    print MYFILE "$callsign:$qam_frequency:QAM_256:$channum:$xmltvid:$serviceid\n";
 }
 
 $dbh->disconnect;
+close (MYFILE);
+
+print "\nDone.  Please send $lineupid.qam.conf file to qam-info\@schedulesdirect.org\n";
 
 exit;
 
