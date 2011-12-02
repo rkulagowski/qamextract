@@ -7,3 +7,13 @@ To run this script, you must have the MythTV perl bindings installed.
 On Ubuntu:
 
 $ sudo apt-get install libmythtv-perl
+
+Help is available:
+./qamextract.pl --help
+
+qamextract.pl v0.03 2011-12-01
+This script supports the following command line arguments.
+--debug      Enable debug mode.  Prints additional information
+             to assist with troubleshooting.
+--sourceid   Which sourceid to use.
+--help       This screen.
