@@ -12,7 +12,7 @@ use warnings;
 use DBI;
 use Getopt::Long;
 
-my $version = 0.02;
+my $version = 0.03;
 my $date = "2011-12-01";
 my ($help, $myth, $dbh, $query, $sth, $lineupid, $sourcename);
 my $sourceid = -1;
@@ -57,7 +57,7 @@ if ($sourceid == -1) {
         print "$source\t\t $name\n";
         $i++;
         # Save the sourceid in case we only go through the loop once.
-        $sourceid = $source; 
+        $sourceid = $source;
     }
 
     if ($i > 1) {
@@ -94,7 +94,15 @@ while( my @row=$sth->fetchrow_array ) {
 $dbh->disconnect;
 close (MYFILE);
 
-print "\nDone.  Please send $lineupid.qam.conf file to qam-info\@schedulesdirect.org\n";
+print "\nDone. ";
+
+if ($qam_frequency eq "000000000") {
+    print "Did not find any QAM frequency information in this source! $lineupid.qam.conf file " .
+    "may be invalid.\n";
+}
+else {
+    print "Please send $lineupid.qam.conf file to qam-info\@schedulesdirect.org\n";
+}
 
 exit;
 
