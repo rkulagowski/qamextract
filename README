@@ -1,3 +1,9 @@
 The qamextract program is available for MythTV users who have already
 performed a QAM scan and determined their channel mapping.  This utility
 will allow them to share their QAM information with other users.
+
+To run this script, you must have the MythTV perl bindings installed.
+
+On Ubuntu:
+
+$ sudo apt-get install libmythtv-perl
