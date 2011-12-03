@@ -12,8 +12,8 @@ use warnings;
 use DBI;
 use Getopt::Long;
 
-my $version = 0.03;
-my $date = "2011-12-01";
+my $version = "1.00";
+my $date = "2011-12-03";
 my ($help, $myth, $dbh, $query, $sth, $lineupid, $sourcename);
 my $sourceid = -1;
 my $qam_frequency = "000000000";
@@ -73,7 +73,10 @@ $sth = &query( $dbh, $query );
 my @row=$sth->fetchrow_array;
 ($lineupid) = @row;
 
+
+$lineupid =~ s/\W//;
 open MYFILE, ">", "$lineupid.qam.conf";
+print MYFILE "\n# qamextract.pl v$version $date\n";
 
 $query = "SELECT channum, callsign, xmltvid, mplexid, serviceid FROM channel where sourceid=$sourceid;";
 $sth = &query( $dbh, $query );
