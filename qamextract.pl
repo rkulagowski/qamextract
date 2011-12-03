@@ -12,7 +12,7 @@ use warnings;
 use DBI;
 use Getopt::Long;
 
-my $version = "1.00";
+my $version = "1.01";
 my $date = "2011-12-03";
 my ($help, $myth, $dbh, $query, $sth, $lineupid, $sourcename);
 my $sourceid = -1;
@@ -76,7 +76,7 @@ my @row=$sth->fetchrow_array;
 
 $lineupid =~ s/\W//;
 open MYFILE, ">", "$lineupid.qam.conf";
-print MYFILE "\n# qamextract.pl v$version $date\n";
+print MYFILE "\n# qamextract.pl v$version $date $lineupid\n";
 
 $query = "SELECT channum, callsign, xmltvid, mplexid, serviceid FROM channel where sourceid=$sourceid;";
 $sth = &query( $dbh, $query );
@@ -104,7 +104,7 @@ if ($qam_frequency eq "000000000") {
     "may be invalid.\n";
 }
 else {
-    print "Please send $lineupid.qam.conf file to qam-info\@schedulesdirect.org\n";
+    print "Please email the $lineupid.qam.conf file to qam-info\@schedulesdirect.org\n";
 }
 
 exit;
