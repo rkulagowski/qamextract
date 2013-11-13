@@ -12,8 +12,8 @@ use warnings;
 use DBI;
 use Getopt::Long;
 
-my $version = "1.01";
-my $date = "2011-12-03";
+my $version = "1.02";
+my $date = "2013-11-13";
 my ($help, $myth, $dbh, $query, $sth, $lineupid, $sourcename);
 my $sourceid = -1;
 my $qam_frequency = "000000000";
@@ -32,13 +32,13 @@ GetOptions ('debug' => \$debugenabled,
             'help|?' => \$help);
 
 if ($help) {
-  print "\nqamextract.pl v$version $date\n" .
-        "This script supports the following command line arguments." .
-        "\n--debug      Enable debug mode.  Prints additional information " .
-        "\n             to assist with troubleshooting." .
-        "\n--sourceid   Which sourceid to use." .
-        "\n--help       This screen.\n" .
-        "\nBug reports to qam-info\@schedulesdirect.org\n\n";
+  print "\nqamextract.pl v$version $date\n"; 
+  print "This script supports the following command line arguments.\n";
+  print "--debug      Enable debug mode.  Prints additional information\n";
+  print "             to assist with troubleshooting.\n";
+  print "--sourceid   Which sourceid to use.\n";
+  print "--help       This screen.\n";
+  print "Bug reports to qam-info\@schedulesdirect.org\n\n";
   exit;
 }
 
